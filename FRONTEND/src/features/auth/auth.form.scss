@@ -1,0 +1,53 @@
+main{
+    min-height:100vh;
+    width:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    .form-container{
+        width:100%;
+        max-width:30rem;
+        padding:2rem;
+        border-radius:0.5rem;
+        background-color:#161515;
+
+        display:flex;
+        flex-direction:column;
+        gap:1rem;
+
+        h2{
+            text-align:center;
+            font-size:1.5rem;
+            font-weight:bold;
+            color:antiquewhite;
+        }
+    }
+
+    form{
+        display:flex;
+        flex-direction:column;
+        gap:0.75rem;
+    }
+
+    .input-group{
+        display:flex;
+        flex-direction:column;
+
+        gap:0.5rem;
+
+        input{
+            border:none;
+            outline:none;
+            padding-inline:1rem;
+            padding-block:0.75rem;
+            border-radius:0.5rem;
+        }
+    }
+    a{
+        color:#15664B;
+        text-decoration:none;
+    }
+
+}

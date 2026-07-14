@@ -1,0 +1,26 @@
+.button{
+    border:none;
+    outline:none;
+    padding-inline:1.5rem;
+    padding-block:0.75rem;
+    border-radius:1rem;
+    cursor:pointer;
+    font-size:1.5rem;
+    
+    transition:all 0.3s ease-in-out;
+
+    &.primary-button{
+        background-color:#15664b;
+        color:rgb(227, 223, 219);
+
+         &:hover {
+      box-shadow: 0 0 15px rgba(227, 223, 219, 0.8); // glow effect
+      transform: scale(1.05); // thoda bada ho jaye
+         }
+        
+    }
+    &:active{
+    transform :scale(0.8)
+}
+
+}
