@@ -49,20 +49,29 @@ const Home = () => {
   const { loading, generateReport, reports } = useInterview()
   const [jobDescription, setJobDescription] = useState("")
   const [selfDescription, setSelfDescription] = useState("")
-  const [resumeFileName, setResumeFileName] = useState("No file selected")   // ✅ new state
+  const [resumeFileName, setResumeFileName] = useState("No file selected")
   const resumeInputRef = useRef()
 
   const navigate = useNavigate()
 
   const handleGenerateReport = async () => {
+    if (!jobDescription.trim() || !selfDescription.trim()) {
+      alert("Please enter both a job description and self description.")
+      return
+    }
+
+    const resumeFile = resumeInputRef.current?.files?.[0]
+    if (!resumeFile) {
+      alert("Please upload your resume PDF.")
+      return
+    }
+
     try {
-      const resumeFile = resumeInputRef.current.files[0]
       const data = await generateReport({ jobDescription, selfDescription, resumeFile })
 
-      if (data && data._id) {
+      if (data?._id) {
         navigate(`/interview/${data._id}`)
       } else {
-        console.error("No report ID returned:", data)
         alert("Failed to generate report. Please try again.")
       }
     } catch (error) {

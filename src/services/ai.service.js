@@ -1,5 +1,5 @@
 const {GoogleGenAI} =require ("@google/genai")
-const {z}= require ("zod")
+const { z } = require("zod/v3")
 const {zodToJsonSchema}= require ("zod-to-json-schema")
 const puppeteer = require ("puppeteer")
 
@@ -33,32 +33,36 @@ const interviewReportSchema = z.object({
 })
 
 
-async function generateInterviewReport ({resume,selfDescription,jobDescription}){
-
-      const prompt = `Generate a good explained interview report for a candidate with the following details:
+async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
+    const prompt = `Generate a good explained interview report for a candidate with the following details:
                         Resume: ${resume}
                         Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}`
-                        
+                        Job Description: ${jobDescription}`;
 
     const response = await ai.models.generateContent({
-        model:"gemini-2.5-flash",
-        contents:prompt,
-        config:{
-            responseMimeType:"application/json",
-            responseSchema:zodToJsonSchema(interviewReportSchema),
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(interviewReportSchema),
+        },
+    });
 
-        }
-    })
-    return JSON.parse(response.text)
+    if (!response.text) {
+        throw new Error("AI returned an empty response");
+    }
 
+    return JSON.parse(response.text);
 }
 
 
 
 async function generatePdfFromHtml(htmlContent){
 
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    })
     const page =await browser.newPage()
 
     await page.setContent(htmlContent,{waitUntil : "networkidle0"})
@@ -108,9 +112,17 @@ async function generateResumePdf({resume,selfDescription, jobDescription}){
         }
     })
 
-     const jsonContent= JSON.parse(response.text)
+    if (!response.text) {
+        throw new Error("AI returned an empty response");
+    }
 
-     const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
+    const jsonContent = JSON.parse(response.text)
+
+    if (!jsonContent.html) {
+        throw new Error("AI returned invalid resume HTML");
+    }
+
+    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
      return pdfBuffer
 }

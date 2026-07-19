@@ -14,11 +14,12 @@ const Login = () => {
     const[password,setPassword]=useState("")
 
 
-    const handleSubmit=async (e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault()
-       await handleLogin({email,password})
-       navigate("/")
-
+        const success = await handleLogin({ email, password })
+        if (success) {
+            navigate("/")
+        }
     }
 
     if(loading){

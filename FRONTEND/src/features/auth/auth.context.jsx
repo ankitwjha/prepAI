@@ -1,5 +1,4 @@
-import { createContext,useState } from "react";
-import {getMe} from "./services/auth.api"
+import { createContext, useState } from "react";
 
 
 export const AuthContext=createContext()
