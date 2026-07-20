@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const tokenBlackListModel = require("../models/blacklist.model");
 
+const JWT_SECRET = process.env.JWT_SECRET || "prep_ai_default_fallback_jwt_secret_key_2026";
+
 /**
  * @name registerUserController
  * @description register a new user, expects username, email and password
@@ -44,7 +46,7 @@ async function registerUserController(req, res) {
 
         const token = jwt.sign(
             { id: user._id, username: user.username },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: "1d" }
         );
 
@@ -116,7 +118,7 @@ async function loginUserController(req, res) {
 
         const token = jwt.sign(
             { id: user._id, username: user.username },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: "1d" }
         );
 
