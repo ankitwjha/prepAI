@@ -44,6 +44,7 @@ import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview'
 import { useNavigate } from 'react-router'
+import LoadingScreen from '../../../components/LoadingScreen'
 
 const Home = () => {
   const { loading, generateReport, reports } = useInterview()
@@ -81,11 +82,7 @@ const Home = () => {
   }
 
   if (loading) {
-    return (
-      <main className='loading-screen'>
-        <h1>Loading your interview plan...</h1>
-      </main>
-    )
+    return <LoadingScreen message="Generating tailored 5-day interview plan & questions..." />
   }
 
   return (
@@ -115,10 +112,10 @@ const Home = () => {
               accept=".pdf"
               onChange={(e) => {
                 const file = e.target.files[0]
-                setResumeFileName(file ? file.name : "No file selected")   // ✅ update filename
+                setResumeFileName(file ? file.name : "No file selected")
               }}
             />
-            <span className="file-name">{resumeFileName}</span>   {/* ✅ dynamic filename */}
+            <span className="file-name">{resumeFileName}</span>
           </div>
           <div className="input-group">
             <label htmlFor="selfDescription">Self Description</label>
@@ -135,19 +132,38 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Recent Reports List */}
-      {reports.length > 0 && (
+      {/* Redesigned Previous Reports List */}
+      {reports && reports.length > 0 && (
         <section className='recent-reports'>
-          <h2>My Recent Interview Plans</h2>
-          <ul className='reports-list'>
+          <div className="reports-header">
+            <h2>My Previous Interview Plans</h2>
+            <span className="reports-count">{reports.length} Reports</span>
+          </div>
+
+          <div className='reports-grid'>
             {reports.map(report => (
-              <li key={report._id} className='report-item' onClick={() => navigate(`/interview/${report._id}`)}>
-                <h3>{report.title || 'Untitled Position'}</h3>
-                <p className='report-meta'>Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
-                <p className={`match-score ${report.matchScore >= 80 ? 'score--high' : report.matchScore >= 60 ? 'score--mid' : 'score--low'}`}>Match Score: {report.matchScore}%</p>
-              </li>
+              <div key={report._id} className='report-card' onClick={() => navigate(`/interview/${report._id}`)}>
+                <div className="card-top">
+                  <span className="card-icon">🎯</span>
+                  <h3 className="card-title">{report.title || 'Untitled Position'}</h3>
+                </div>
+
+                <div className="card-body">
+                  <span className={`match-pill ${report.matchScore >= 80 ? 'match--high' : report.matchScore >= 60 ? 'match--mid' : 'match--low'}`}>
+                    {report.matchScore}% Match
+                  </span>
+                  <span className="date-badge">
+                    {new Date(report.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                </div>
+
+                <div className="card-footer">
+                  <span>View Plan</span>
+                  <svg className="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
       )}
     </main>

@@ -1,46 +1,56 @@
-// ── Shared Variables (mirrors home.scss theme) ────────────────────────────────
-$bg-page: #0d1117;
-$bg-card: #161b22;
-$bg-panel: #1c2230;
-$bg-input: #1e2535;
-$border-color: #2a3348;
-$text-primary: #e6edf3;
-$text-muted: #7d8590;
-$accent: #ff2d78;
-$font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+@use "sass:color";
 
-// severity palette
-$severity-high: #ff4d4d;
-$severity-medium: #f5a623;
-$severity-low: #3fb950;
+// ── Variables & Design System ──────────────────────────────────────────────────
+$bg-dark:       #0b0f19;
+$bg-card:       #111827;
+$bg-panel:      #1f2937;
+$border-color:  #374151;
 
-*::-webkit-scrollbar {
-    display: none;
-}
+$text-primary:   #f9fafb;
+$text-secondary: #d1d5db;
+$text-muted:     #9ca3af;
 
-// ── Page Shell ────────────────────────────────────────────────────────────────
+$accent:         #6366f1;
+$accent-hover:   #4f46e5;
+$accent-light:   #818cf8;
+
+$score-high:     #10b981;
+$score-mid:      #f59e0b;
+$score-low:      #ef4444;
+
+$font-stack:     'Inter', system-ui, -apple-system, sans-serif;
+
+// ── Layout ────────────────────────────────────────────────────────────────────
 .interview-page {
-    width: 100%;
     min-height: 100vh;
-    background-color: $bg-page;
+    background-color: $bg-dark;
     color: $text-primary;
     font-family: $font-stack;
-    display: flex;
-    align-items: stretch;
-    padding: 1.5rem;
+    padding: 1.5rem 2rem;
     box-sizing: border-box;
+
+    &.loading-screen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        h1 {
+            color: $text-muted;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+    }
 }
 
-// ── 3-Column Layout ───────────────────────────────────────────────────────────
 .interview-layout {
     display: flex;
-    width: 100%;
-    max-width: 1280px;
+    max-width: 1200px;
     margin: 0 auto;
     background-color: $bg-card;
     border: 1px solid $border-color;
     border-radius: 1rem;
-    justify-content: space-between;
+    overflow: hidden;
+    min-height: 80vh;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
 .interview-divider {
@@ -49,27 +59,29 @@ $severity-low: #3fb950;
     flex-shrink: 0;
 }
 
-// ── Left Nav ─────────────────────────────────────────────────────────────────
+// ── Navigation ────────────────────────────────────────────────────────────────
 .interview-nav {
     width: 220px;
     flex-shrink: 0;
-    padding: 1.75rem 1rem;
+    padding: 1.5rem 1rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 0.25rem;
 
-
-
+    .nav-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 
     &__label {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
         color: $text-muted;
-        padding: 0 0.75rem;
         margin-bottom: 0.5rem;
+        padding-left: 0.5rem;
     }
 
     &__item {
@@ -108,7 +120,37 @@ $severity-low: #3fb950;
         align-items: center;
         flex-shrink: 0;
     }
+
+    .button.primary-button {
+        margin-top: auto;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 0.65rem;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        transition: all 0.25s ease;
+        box-sizing: border-box;
+
+        &:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.55);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
 }
+
+
 
 // ── Center Content ────────────────────────────────────────────────────────────
 .interview-content {
@@ -116,44 +158,27 @@ $severity-low: #3fb950;
     padding: 1.75rem 2rem;
     overflow-y: auto;
     min-height: initial;
-    max-height: calc(100vh - 3rem);
-    padding-bottom: 5rem;
-    align-items: flex-start;
 
+    .content-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
 
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
 
-
-
-
-
-
-    section {
-        min-height: 100%;
-    }
-}
-
-.content-header {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid $border-color;
-
-    h2 {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: $text-primary;
-        margin: 0;
-    }
-
-    &__count {
-        font-size: 0.8rem;
-        color: $text-muted;
-        background-color: $bg-panel;
-        padding: 0.15rem 0.6rem;
-        border-radius: 2rem;
-        border: 1px solid $border-color;
+        &__count {
+            font-size: 0.8rem;
+            color: $text-muted;
+            background-color: $bg-panel;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            border: 1px solid $border-color;
+        }
     }
 }
 
@@ -169,198 +194,169 @@ $severity-low: #3fb950;
     border: 1px solid $border-color;
     border-radius: 0.6rem;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s;
 
     &:hover {
-        border-color: lighten($border-color, 8%);
+        border-color: color.adjust($border-color, $lightness: 10%);
     }
 
     &__header {
+        padding: 1rem 1.25rem;
         display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        padding: 0.9rem 1rem;
+        align-items: center;
+        gap: 0.85rem;
         cursor: pointer;
         user-select: none;
     }
 
     &__index {
-        flex-shrink: 0;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        color: $accent;
-        background-color: rgba($accent, 0.1);
-        border: 1px solid rgba($accent, 0.2);
-        border-radius: 0.3rem;
-        padding: 0.15rem 0.4rem;
-        margin-top: 2px;
+        color: $accent-light;
+        background-color: rgba($accent, 0.12);
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.35rem;
+        flex-shrink: 0;
     }
 
     &__question {
-        flex: 1;
-        margin: 0;
-        font-size: 0.9rem;
+        font-size: 0.925rem;
         font-weight: 500;
         color: $text-primary;
-        line-height: 1.5;
+        margin: 0;
+        flex: 1;
+        line-height: 1.4;
     }
 
     &__chevron {
-        flex-shrink: 0;
         color: $text-muted;
-        transition: transform 0.2s;
-        margin-top: 2px;
+        transition: transform 0.2s ease;
+        display: flex;
+        align-items: center;
 
         &--open {
             transform: rotate(180deg);
-            color: $accent;
         }
     }
 
     &__body {
-        padding: 0 1rem 1rem;
+        padding: 0 1.25rem 1.25rem 1.25rem;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        border-top: 1px solid $border-color;
-        padding-top: 0.75rem;
+        gap: 1rem;
+        border-top: 1px solid rgba($border-color, 0.5);
+        margin-top: 0.25rem;
+        padding-top: 1rem;
     }
 
     &__section {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: 0.35rem;
 
         p {
             margin: 0;
-            font-size: 0.835rem;
-            color: lighten($text-muted, 15%);
-            line-height: 1.6;
+            font-size: 0.875rem;
+            color: $text-secondary;
+            line-height: 1.5;
         }
     }
 
     &__tag {
-        font-size: 0.68rem;
-        font-weight: 700;
+        font-size: 0.7rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        padding: 0.15rem 0.5rem;
-        border-radius: 0.25rem;
+        letter-spacing: 0.05em;
         width: fit-content;
+        padding: 0.15rem 0.45rem;
+        border-radius: 0.25rem;
 
         &--intention {
-            color: #a78bfa;
-            background-color: rgba(#a78bfa, 0.1);
-            border: 1px solid rgba(#a78bfa, 0.2);
+            color: #60a5fa;
+            background-color: rgba(#3b82f6, 0.1);
         }
 
         &--answer {
-            color: #3fb950;
-            background-color: rgba(#3fb950, 0.1);
-            border: 1px solid rgba(#3fb950, 0.2);
+            color: #34d399;
+            background-color: rgba(#10b981, 0.1);
         }
     }
 }
 
-// ── Road Map ──────────────────────────────────────────────────────────────────
+// ── Roadmap ───────────────────────────────────────────────────────────────────
 .roadmap-list {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    position: relative;
-
-    // vertical timeline line
-    &::before {
-        content: '';
-        position: absolute;
-        left: 28px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: linear-gradient(to bottom, $accent, rgba($accent, 0.1));
-        border-radius: 1px;
-    }
+    gap: 1rem;
 }
 
 .roadmap-day {
+    background-color: $bg-panel;
+    border: 1px solid $border-color;
+    border-radius: 0.6rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.75rem 0 0.75rem 3.5rem;
-    position: relative;
-
-    // dot on timeline
-    &::before {
-        content: '';
-        position: absolute;
-        left: 21px;
-        top: 1.05rem;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background-color: $bg-card;
-        border: 2px solid $accent;
-    }
+    gap: 0.75rem;
 
     &__header {
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.75rem;
     }
 
     &__badge {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        color: $accent;
-        background-color: rgba($accent, 0.1);
-        border: 1px solid rgba($accent, 0.25);
-        padding: 0.1rem 0.5rem;
-        border-radius: 2rem;
+        color: $accent-light;
+        background-color: rgba($accent, 0.12);
+        padding: 0.25rem 0.6rem;
+        border-radius: 0.35rem;
     }
 
     &__focus {
-        margin: 0;
-        font-size: 0.95rem;
+        font-size: 0.975rem;
         font-weight: 600;
         color: $text-primary;
+        margin: 0;
     }
 
     &__tasks {
-        list-style: none;
         margin: 0;
         padding: 0;
+        list-style: none;
         display: flex;
         flex-direction: column;
-        gap: 0.35rem;
+        gap: 0.4rem;
 
         li {
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
-            font-size: 0.845rem;
-            color: lighten($text-muted, 12%);
-            line-height: 1.5;
-        }
-    }
+            font-size: 0.85rem;
+            color: $text-secondary;
+            line-height: 1.4;
 
-    &__bullet {
-        flex-shrink: 0;
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background-color: $text-muted;
-        margin-top: 8px;
+            .roadmap-day__bullet {
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background-color: $accent;
+                margin-top: 0.45rem;
+                flex-shrink: 0;
+            }
+        }
     }
 }
 
-// ── Right Sidebar ─────────────────────────────────────────────────────────────
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 .interview-sidebar {
     width: 240px;
     flex-shrink: 0;
     padding: 1.75rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.75rem;
 }
 
 .sidebar-divider {
@@ -368,112 +364,111 @@ $severity-low: #3fb950;
     background-color: $border-color;
 }
 
-// Match Score
+// ── Match Score Ring ──────────────────────────────────────────────────────────
 .match-score {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.6rem;
+    text-align: center;
 
     &__label {
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
         color: $text-muted;
-        margin: 0;
-        align-self: flex-start;
+        margin: 0 0 1rem 0;
     }
 
     &__ring {
         width: 90px;
         height: 90px;
         border-radius: 50%;
+        border: 4px solid $border-color;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        border: 4px solid;
+        margin-bottom: 0.75rem;
+        position: relative;
 
         &.score--high {
-            border-color: $severity-low;
+            border-color: $score-high;
+            box-shadow: 0 0 12px rgba($score-high, 0.25);
         }
 
         &.score--mid {
-            border-color: $severity-medium;
+            border-color: $score-mid;
+            box-shadow: 0 0 12px rgba($score-mid, 0.25);
         }
 
         &.score--low {
-            border-color: $severity-high;
+            border-color: $score-low;
+            box-shadow: 0 0 12px rgba($score-low, 0.25);
         }
     }
 
     &__value {
         font-size: 1.6rem;
-        font-weight: 800;
+        font-weight: 700;
         color: $text-primary;
         line-height: 1;
     }
 
     &__pct {
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         color: $text-muted;
-        margin-top: -2px;
+        font-weight: 500;
     }
 
     &__sub {
+        font-size: 0.8rem;
+        color: $text-muted;
         margin: 0;
-        font-size: 0.75rem;
-        color: $severity-low;
-        text-align: center;
     }
 }
 
-// Skill Gaps
+// ── Skill Gaps ────────────────────────────────────────────────────────────────
 .skill-gaps {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
 
     &__label {
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
         color: $text-muted;
-        margin: 0;
+        margin: 0 0 0.85rem 0;
     }
 
     &__list {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+        flex-direction: column;
+        gap: 0.45rem;
     }
 }
 
 .skill-tag {
     font-size: 0.775rem;
-    font-weight: 500;
-    padding: 0.3rem 0.7rem;
+    padding: 0.35rem 0.65rem;
     border-radius: 0.4rem;
-    border: 1px solid;
-    cursor: default;
+    border: 1px solid transparent;
 
     &--high {
-        color: $severity-high;
-        background-color: rgba($severity-high, 0.1);
-        border-color: rgba($severity-high, 0.25);
+        color: #fca5a5;
+        background-color: rgba(#ef4444, 0.1);
+        border-color: rgba(#ef4444, 0.2);
     }
 
     &--medium {
-        color: $severity-medium;
-        background-color: rgba($severity-medium, 0.1);
-        border-color: rgba($severity-medium, 0.25);
+        color: #fde047;
+        background-color: rgba(#eab308, 0.1);
+        border-color: rgba(#eab308, 0.2);
     }
 
     &--low {
-        color: $severity-low;
-        background-color: rgba($severity-low, 0.1);
-        border-color: rgba($severity-low, 0.25);
+        color: #93c5fd;
+        background-color: rgba(#3b82f6, 0.1);
+        border-color: rgba(#3b82f6, 0.2);
     }
 }

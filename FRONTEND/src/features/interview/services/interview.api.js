@@ -1,9 +1,11 @@
 import axios from "axios";
 
 
-const api =axios.create({
-    baseURL:"http://localhost:3000",
-    withCredentials:true,
+const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:3000' : '');
+
+const api = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
 })
 
 /**
