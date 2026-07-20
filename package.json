@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx nodemon server.js",
-    "postinstall": "npm install --prefix FRONTEND",
-    "build": "npm run build --prefix FRONTEND"
+    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --prefix FRONTEND",
+    "build": "cd FRONTEND && npm run build"
   },
   "keywords": [],
   "author": "",
