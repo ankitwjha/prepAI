@@ -30,6 +30,22 @@ const authRouter=require("./routes/auth.routes")
 const interviewRouter = require ("./routes/interview.routes")
 
 
+const mongoose = require("mongoose");
+
+// Healthcheck endpoint for Vercel deployment diagnostics
+app.get(["/api/ping", "/ping"], (req, res) => {
+    res.json({
+        status: "ok",
+        message: "PrepAI API Serverless is online!",
+        dbState: mongoose.connection.readyState,
+        env: {
+            hasMongoUri: !!process.env.MONGO_URI,
+            hasJwtSecret: !!process.env.JWT_SECRET,
+            hasGenAiKey: !!process.env.GOOGLE_GENAI_API_KEY
+        }
+    });
+});
+
 //using all the routes here (supporting both /api and direct serverless paths)
 app.use(["/api/auth", "/auth"], authRouter)
 app.use(["/api/interview", "/interview"], interviewRouter)
