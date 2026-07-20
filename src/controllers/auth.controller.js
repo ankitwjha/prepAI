@@ -70,7 +70,7 @@ async function registerUserController(req, res) {
             });
         }
         return res.status(500).json({
-            message: "Registration failed due to server error"
+            message: err.message || "Registration failed due to server error"
         });
     }
 }
@@ -137,7 +137,7 @@ async function loginUserController(req, res) {
     } catch (err) {
         console.error("Login controller error:", err);
         return res.status(500).json({
-            message: "Login failed due to server error"
+            message: err.message || "Login failed due to server error"
         });
     }
 }
