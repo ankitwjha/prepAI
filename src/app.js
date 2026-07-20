@@ -30,9 +30,16 @@ const authRouter=require("./routes/auth.routes")
 const interviewRouter = require ("./routes/interview.routes")
 
 
-//using all the routes here
-app.use ("/api/auth",authRouter)
-app.use ("/api/interview",interviewRouter)
+//using all the routes here (supporting both /api and direct serverless paths)
+app.use(["/api/auth", "/auth"], authRouter)
+app.use(["/api/interview", "/interview"], interviewRouter)
 
+// Global error handler for serverless functions
+app.use((err, req, res, next) => {
+    console.error("Uncaught Express Error:", err);
+    res.status(500).json({
+        message: err.message || "An internal server error occurred"
+    });
+});
 
 module.exports=app
