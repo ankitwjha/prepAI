@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import '../style/interview.scss'
+import '../style/Interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
 import { useParams } from 'react-router'
 import LoadingScreen from '../../../components/LoadingScreen'
