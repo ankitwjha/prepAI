@@ -1,7 +1,6 @@
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
 const { zodToJsonSchema } = require("zod-to-json-schema");
-const puppeteer = require("puppeteer");
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
@@ -442,9 +441,20 @@ async function generatePdfFromHtml(htmlContent) {
 </html>`;
         }
 
+        let puppeteer;
+        try {
+            puppeteer = require("puppeteer");
+        } catch (e) {
+            console.warn("Puppeteer module load failed in serverless context:", e.message);
+        }
+
+        if (!puppeteer) {
+            throw new Error("PDF generation via Puppeteer is not supported in this serverless environment.");
+        }
+
         const browser = await puppeteer.launch({
             headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
         });
         const page = await browser.newPage();
         await page.setContent(cleanHtml, { waitUntil: "networkidle0" });
@@ -457,7 +467,7 @@ async function generatePdfFromHtml(htmlContent) {
         return pdfBuffer;
     } catch (err) {
         console.error("Puppeteer error:", err);
-        throw new Error("Failed to generate PDF from HTML");
+        throw new Error("Failed to generate PDF from HTML: " + err.message);
     }
 }
 
