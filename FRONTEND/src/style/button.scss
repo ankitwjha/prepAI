@@ -11,12 +11,14 @@
 
     &.primary-button{
         font-size: 20px;
-        background-color:#15664b;
-        color:rgb(227, 223, 219);
+        background-color:#10b981;
+        color:#ffffff;
+        font-weight: 600;
 
          &:hover {
-      box-shadow: 0 0 15px rgba(227, 223, 219, 0.8); // glow effect
-      transform: scale(1.05); // thoda bada ho jaye
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); // glow effect
+      transform: scale(1.03); 
+      background-color: #059669;
          }
         
     }

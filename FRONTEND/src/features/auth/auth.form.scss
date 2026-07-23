@@ -1,16 +1,16 @@
 // ── Auth Pages Modern Minimalist & Humor-infused Theme ────────────────────────
-$bg-dark:       #0b0f19;
-$bg-card:       #111827;
-$bg-panel:      #1f2937;
-$border-color:  #374151;
+$bg-dark:       #030712;
+$bg-card:       #0b0f19;
+$bg-panel:      #111827;
+$border-color:  rgba(255, 255, 255, 0.07);
 
 $text-primary:   #f9fafb;
 $text-secondary: #d1d5db;
 $text-muted:     #9ca3af;
 
-$accent:         #6366f1;
-$accent-hover:   #4f46e5;
-$accent-light:   #818cf8;
+$accent:         #10b981;
+$accent-hover:   #059669;
+$accent-light:   #34d399;
 
 .auth-page {
   min-height: 100vh;
@@ -47,7 +47,7 @@ $accent-light:   #818cf8;
   &::after {
     width: 360px;
     height: 360px;
-    background: #4f46e5;
+    background: $accent-hover;
     bottom: -80px;
     right: -80px;
     animation: orb-float 15s infinite ease-in-out alternate-reverse;
