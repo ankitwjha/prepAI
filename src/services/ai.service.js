@@ -30,6 +30,63 @@ const interviewReportSchema = z.object({
     title: z.string().describe("The title for the job for which the interview report is generated")
 });
 
+function checkDomainMismatch(bgLower, jdLower) {
+    if (!bgLower.trim() || !jdLower.trim()) return false;
+
+    const domains = [
+        {
+            name: "tech",
+            keywords: [
+                "software", "developer", "engineer", "programmer", "coding", "code", "devops", "cloud", "aws", "azure", "gcp",
+                "kubernetes", "docker", "python", "javascript", "typescript", "java", "golang", "ruby", "php", "c++", "c#",
+                "frontend", "backend", "fullstack", "database", "sql", "nosql", "git", "ci/cd", "linux", "sysadmin", "cybersecurity",
+                "network", "security", "ai", "ml", "machine learning", "deep learning", "nlp", "data scientist", "data engineer"
+            ]
+        },
+        {
+            name: "finance_accounting",
+            keywords: [
+                "accountant", "accounting", "chartered accountant", "charted accountant", "ca", "cpa", "finance", "financial",
+                "audit", "auditing", "tax", "taxation", "ledger", "bookkeeping", "gst", "tally", "balance sheet", "banking", "treasury"
+            ]
+        },
+        {
+            name: "medical_healthcare",
+            keywords: [
+                "doctor", "physician", "nurse", "nursing", "medical", "healthcare", "clinical", "hospital", "surgery", "surgeon",
+                "pharmacist", "pharmacy", "pediatrician", "therapy", "therapist", "dentist", "patient"
+            ]
+        },
+        {
+            name: "legal",
+            keywords: [
+                "lawyer", "attorney", "legal", "law", "court", "litigation", "paralegal", "judge", "counsel", "contract law"
+            ]
+        }
+    ];
+
+    const jdDomains = domains.filter(d => d.keywords.some(kw => jdLower.includes(kw))).map(d => d.name);
+    const bgDomains = domains.filter(d => d.keywords.some(kw => bgLower.includes(kw))).map(d => d.name);
+
+    if (jdDomains.length > 0 && bgDomains.length > 0) {
+        const hasOverlap = jdDomains.some(d => bgDomains.includes(d));
+        if (!hasOverlap) {
+            return true;
+        }
+    }
+
+    const jdIsTech = jdDomains.includes("tech") || /\b(aws|cloud|software|developer|engineer|devops)\b/i.test(jdLower);
+    const bgHasTech = bgDomains.includes("tech") || /\b(software|developer|engineer|programmer|coding|code|aws|cloud|devops|python|java|javascript|typescript|c\+\+|golang)\b/i.test(bgLower);
+
+    if (jdIsTech && !bgHasTech) {
+        if (bgDomains.length > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function buildDynamicFallbackPayload({ resume, selfDescription, jobDescription }) {
     const jdLower = (jobDescription || "Software Engineer").toLowerCase();
     const bgLower = `${resume || ""} ${selfDescription || ""}`.toLowerCase();
@@ -61,7 +118,8 @@ function buildDynamicFallbackPayload({ resume, selfDescription, jobDescription }
 
     // 3. Compute match score dynamically
     const indicatesNoKnowledge = !bgLower.trim() || /nothing|no experience|dont know|don't know|zero|none|beginner|no skill|know nothing/i.test(bgLower);
-    const matchScore = indicatesNoKnowledge ? (Math.floor(Math.random() * 10) + 18) : (Math.floor(Math.random() * 15) + 65);
+    const isFieldMismatch = checkDomainMismatch(bgLower, jdLower);
+    const matchScore = (indicatesNoKnowledge || isFieldMismatch) ? (Math.floor(Math.random() * 10) + 18) : (Math.floor(Math.random() * 15) + 65);
 
     // 4. Tailor Technical Questions dynamically
     const technicalQuestions = [
@@ -112,7 +170,7 @@ function buildDynamicFallbackPayload({ resume, selfDescription, jobDescription }
     ];
 
     // 6. Tailor Skill Gaps dynamically
-    const skillGaps = indicatesNoKnowledge ? [
+    const skillGaps = (indicatesNoKnowledge || isFieldMismatch) ? [
         { skill: `${roleTitle} Core Concepts & Algorithms`, severity: "high" },
         { skill: `Hands-on Experience with ${primaryTech}`, severity: "high" },
         { skill: "System Architecture & Production Deployment", severity: "high" },
@@ -327,8 +385,9 @@ STRICT EVALUATION & MATCH SCORE RULES:
     const combinedBackground = `${resume || ""} ${selfDescription || ""}`.toLowerCase();
     const indicatesNoKnowledge = !combinedBackground.trim() || 
         /nothing|no experience|dont know|don't know|zero|none|beginner|no skill|know nothing/i.test(combinedBackground);
+    const isFieldMismatch = checkDomainMismatch(combinedBackground, jobDescription.toLowerCase());
 
-    if (indicatesNoKnowledge) {
+    if (indicatesNoKnowledge || isFieldMismatch) {
         // Cap match score strictly to low range (18-28%)
         result.matchScore = Math.floor(Math.random() * 10) + 18;
     } else if (typeof result.matchScore !== "number" || result.matchScore < 0 || result.matchScore > 100) {
