@@ -689,4 +689,95 @@ MANDATORY HTML RESUME REQUIREMENTS:
     return await generatePdfFromHtml(jsonContent.html);
 }
 
-module.exports = { generateInterviewReport, generateResumePdf };
+async function callAiChatWithRetry(prompt, systemInstruction) {
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-8b", "gemini-2.5-pro"];
+    let lastError = null;
+
+    for (const model of modelsToTry) {
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                const response = await ai.models.generateContent({
+                    model,
+                    contents: prompt,
+                    config: {
+                        systemInstruction,
+                    },
+                });
+
+                if (response && response.text) {
+                    return response.text;
+                }
+            } catch (err) {
+                lastError = err;
+                console.warn(`[AI Chat] Model ${model} attempt ${attempt} failed:`, err.message || err);
+                if (err.status === 429 || (err.message && err.message.includes("quota"))) {
+                    await new Promise((res) => setTimeout(res, 1500));
+                }
+            }
+        }
+    }
+    throw new Error(lastError ? lastError.message : "All Gemini models failed to generate response.");
+}
+
+async function generateChatResponse({ report, message, history }) {
+    const reportContext = `
+Interview Details:
+- Job Description: ${report.jobDescription}
+- Candidate Self Description: ${report.selfDescription}
+- Match Score: ${report.matchScore}%
+- Skill Gaps: ${JSON.stringify(report.skillGaps)}
+- 5-Day Plan: ${JSON.stringify(report.preparationPlan)}
+`;
+
+    const systemInstruction = `You are "PrepAiHelps", a friendly, empathetic, and knowledgeable AI career coach and technical mentor. 
+Your goal is to help the candidate prepare for their upcoming interviews by answering questions about their active interview report, preparation plan, skill gaps, technical questions, and roadmap.
+
+Context:
+${reportContext}
+
+Instructions:
+- Give highly contextual, precise, and actionable answers.
+- Speak directly to the candidate (use "you" and "your").
+- Keep your answers concise (2-3 paragraphs max), encouraging, and clear.
+- Suggest concrete steps for their skill gaps and roadmap days.
+- If asked questions outside of their career preparation, politely guide them back to their interview prep.
+`;
+
+    let chatHistoryPrompt = "";
+    if (Array.isArray(history)) {
+        history.slice(-10).forEach(h => {
+            const roleName = h.sender === "user" ? "Candidate" : "PrepAiHelps";
+            chatHistoryPrompt += `${roleName}: ${h.text}\n`;
+        });
+    }
+    chatHistoryPrompt += `Candidate: ${message}\nPrepAiHelps:`;
+
+    try {
+        const reply = await callAiChatWithRetry(chatHistoryPrompt, systemInstruction);
+        return reply.trim();
+    } catch (err) {
+        console.warn("[AI Chat] Gemini call failed. Running local fallback chat logic:", err.message);
+        
+        // Conversational Rule-based fallback
+        const msgLower = message.toLowerCase();
+        
+        if (msgLower.includes("skill") || msgLower.includes("gap")) {
+            const gapsList = report.skillGaps.map(g => `- **${g.skill}** (Severity: ${g.severity})`).join("\n");
+            return `Based on my analysis of your profile, here are your key skill gaps:\n\n${gapsList || "No major gaps found!"}\n\nI recommend starting with the high-severity items first. For each gap, you can practice mock coding or concept review. What specific skill would you like to dive into?`;
+        }
+        
+        if (msgLower.includes("plan") || msgLower.includes("roadmap") || msgLower.includes("day") || msgLower.includes("schedule")) {
+            const planList = report.preparationPlan.map(p => `* **Day ${p.day}**: ${p.focus}\n  Tasks: ${p.tasks.join(", ")}`).join("\n\n");
+            return `Here is a summary of your 5-day preparation plan:\n\n${planList}\n\nThis structured schedule will help you cover everything systematically. Which day of the roadmap are you working on today?`;
+        }
+
+        if (msgLower.includes("what should i do") || msgLower.includes("next step") || msgLower.includes("next")) {
+            const topGap = report.skillGaps[0]?.skill || "your core skills";
+            return `For your next steps, I highly recommend looking at Day 1 of your preparation plan: **${report.preparationPlan[0]?.focus || "Core Fundamentals"}**. Focus on closing your gap in **${topGap}**. Set aside 45 minutes today to read up on system design basics and try implementing a small practice module.`;
+        }
+
+        return `Hello! I'm PrepAiHelps. I'm here to support your prep for the **${report.title || "Target Position"}** role (Match Score: ${report.matchScore}%). You can ask me about your skill gaps, preparation plan, technical questions, or what specific topics you should focus on next!`;
+    }
+}
+
+module.exports = { generateInterviewReport, generateResumePdf, generateChatResponse };

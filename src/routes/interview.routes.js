@@ -43,4 +43,12 @@ interviewRouter.get("/",authMiddleware.authUser,interviewController.getAllInterv
 interviewRouter.post("/resume/pdf/:interviewReportId", authMiddleware.authUser,interviewController.generateResumePdfController)
 
 
+/**
+ * POST /api/interview/chat/:interviewReportId
+ * @description chat with AI helper about the interview report
+ * @access private
+ */
+interviewRouter.post("/chat/:interviewReportId", authMiddleware.authUser, interviewController.chatWithInterviewReportController)
+
+
 module.exports= interviewRouter

@@ -1,5 +1,5 @@
 const pdfParse = require("pdf-parse");
-const { generateInterviewReport, generateResumePdf } = require("../services/ai.service");
+const { generateInterviewReport, generateResumePdf, generateChatResponse } = require("../services/ai.service");
 const interviewReportModel = require("../models/interviewReport.model");
 const mongoose = require("mongoose");
 
@@ -201,9 +201,41 @@ async function generateResumePdfController(req, res) {
   }
 }
 
+async function chatWithInterviewReportController(req, res) {
+  try {
+    const { interviewReportId } = req.params;
+    const { message, history } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message field is required." });
+    }
+
+    const interviewReport = await interviewReportModel.findOne({
+      _id: interviewReportId,
+      user: req.user.id,
+    });
+
+    if (!interviewReport) {
+      return res.status(404).json({ error: "Interview report not found." });
+    }
+
+    const reply = await generateChatResponse({
+      report: interviewReport,
+      message,
+      history,
+    });
+
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error("Error in chat controller:", err);
+    res.status(500).json({ error: "Failed to generate chat response." });
+  }
+}
+
 module.exports = {
   generateInterViewReportController,
   getInterviewReportByIdController,
   getAllInterviewReportsController,
   generateResumePdfController,
+  chatWithInterviewReportController,
 };

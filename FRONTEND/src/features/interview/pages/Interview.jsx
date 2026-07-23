@@ -3,6 +3,7 @@ import '../style/Interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
 import { useParams } from 'react-router'
 import LoadingScreen from '../../../components/LoadingScreen'
+import { chatWithInterviewReport } from '../services/interview.api.js'
 
 const NAV_ITEMS = [
     { id: 'technical', label: 'Technical Questions', icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>) },
@@ -60,6 +61,48 @@ const Interview = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
     const { report, loading, getResumePdf } = useInterview()
     const { interviewId } = useParams()
+
+    const [ chatOpen, setChatOpen ] = useState(false)
+    const [ chatInput, setChatInput ] = useState("")
+    const [ chatMessages, setChatMessages ] = useState([
+        { sender: 'bot', text: "Hi, I'm PrepAiHelps! I've analyzed your profile and target job description. You can ask me about your preparation plan, skill gaps, technical questions, or what steps you should take next." }
+    ])
+    const [ chatLoading, setChatLoading ] = useState(false)
+
+    const handleSendChatMessage = async (e) => {
+        if (e) e.preventDefault();
+        if (!chatInput.trim() || chatLoading) return;
+
+        const userMsgText = chatInput.trim();
+        setChatInput("");
+        const newMsgList = [...chatMessages, { sender: 'user', text: userMsgText }];
+        setChatMessages(newMsgList);
+        setChatLoading(true);
+
+        try {
+            const historyForBackend = newMsgList.map(m => ({
+                sender: m.sender,
+                text: m.text
+            }));
+            
+            const data = await chatWithInterviewReport({
+                interviewReportId: interviewId,
+                message: userMsgText,
+                history: historyForBackend.slice(0, -1)
+            });
+
+            if (data?.reply) {
+                setChatMessages(prev => [...prev, { sender: 'bot', text: data.reply }]);
+            } else {
+                setChatMessages(prev => [...prev, { sender: 'bot', text: "Sorry, I encountered an issue generating a response. Please try again." }]);
+            }
+        } catch (err) {
+            console.error("Chat error:", err);
+            setChatMessages(prev => [...prev, { sender: 'bot', text: "Failed to connect to PrepAiHelps helper. Please try again." }]);
+        } finally {
+            setChatLoading(false);
+        }
+    };
 
     if (loading) {
         return <LoadingScreen message="Loading interview report details..." />
@@ -182,6 +225,57 @@ const Interview = () => {
                     </div>
 
                 </aside>
+            </div>
+
+            {/* ── PrepAiHelps Floating Chat Widget ── */}
+            <div className={`prep-chat ${chatOpen ? 'prep-chat--open' : ''}`}>
+                {!chatOpen ? (
+                    <button className="prep-chat__toggle-btn" onClick={() => setChatOpen(true)}>
+                        <span className="prep-chat__icon">💬</span>
+                        <span className="prep-chat__btn-label">PrepAiHelps</span>
+                    </button>
+                ) : (
+                    <div className="prep-chat__window">
+                        <div className="prep-chat__header" onClick={() => setChatOpen(false)}>
+                            <div className="prep-chat__branding">
+                                <span className="prep-chat__status-dot"></span>
+                                <h4 className="prep-chat__title">PrepAiHelps</h4>
+                            </div>
+                            <button className="prep-chat__close-btn" onClick={(e) => { e.stopPropagation(); setChatOpen(false); }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div className="prep-chat__body">
+                            {chatMessages.map((msg, i) => (
+                                <div key={i} className={`prep-chat__msg prep-chat__msg--${msg.sender}`}>
+                                    <div className="prep-chat__msg-bubble">{msg.text}</div>
+                                </div>
+                            ))}
+                            {chatLoading && (
+                                <div className="prep-chat__msg prep-chat__msg--bot">
+                                    <div className="prep-chat__msg-bubble prep-chat__msg-bubble--loading">
+                                        <span className="loading-dot">.</span>
+                                        <span className="loading-dot">.</span>
+                                        <span className="loading-dot">.</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <form className="prep-chat__footer" onSubmit={handleSendChatMessage}>
+                            <input
+                                type="text"
+                                className="prep-chat__input"
+                                value={chatInput}
+                                onChange={(e) => setChatInput(e.target.value)}
+                                placeholder="Ask PrepAiHelps about roadmap, gaps..."
+                                disabled={chatLoading}
+                            />
+                            <button type="submit" className="prep-chat__send-btn" disabled={chatLoading || !chatInput.trim()}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </form>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -4,14 +4,26 @@ import { useNavigate, Link } from "react-router"
 import { useAuth } from '../hooks/useAuth'
 import LoadingScreen from '../../../components/LoadingScreen'
 
-const Register = () => {
+const FUNNY_QUOTES = [
+    "Sign up in 10 seconds. (Fewer than the seconds spent deciding whether to use tabs or spaces).",
+    "Join us and discover why your self-assessed 99% skill rating is actually a 20% match score.",
+    "Let's build a plan that makes your resume look like you know what you're doing.",
+    "Practice interviewing. Or prepare to explain that 6-month 'gap' of finding yourself.",
+    "AI is taking over. Might as well use it to get a job first.",
+    "Start preparing. Because 'I'll wing it' has a 0% success rate."
+];
 
+const Register = () => {
     const navigate = useNavigate()
 
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
+    const [quote] = useState(() => {
+        const randomIndex = Math.floor(Math.random() * FUNNY_QUOTES.length);
+        return FUNNY_QUOTES[randomIndex];
+    });
 
     const { loading, handleRegister } = useAuth()
 
@@ -40,6 +52,11 @@ const Register = () => {
                         <span className="brand-title">PrepAI</span>
                     </div>
                     <p className="brand-tagline">AI-Powered Interview Intelligence</p>
+                </div>
+
+                <div className="humor-quote-card">
+                    <span className="quote-icon">🚀</span>
+                    <p className="quote-text">"{quote}"</p>
                 </div>
 
                 <h1>Create an Account</h1>
@@ -71,7 +88,7 @@ const Register = () => {
                     <button type="submit" className='auth-submit-btn'>Register Now</button>
                 </form>
 
-                <p>Already have an account? <Link to={"/login"}>Sign In</Link></p>
+                <p className="auth-footer-text">Already have an account? <Link to={"/login"}>Sign In</Link></p>
             </div>
         </div>
     )
