@@ -1,10 +1,34 @@
 const pdfParse = require("pdf-parse");
 const { generateInterviewReport, generateResumePdf } = require("../services/ai.service");
 const interviewReportModel = require("../models/interviewReport.model");
+const mongoose = require("mongoose");
+
+async function logSystemError(req, message, error = null) {
+  try {
+    const errorLog = {
+      timestamp: new Date(),
+      userId: req.user?.id,
+      message,
+      ip: req.ip || req.headers["x-forwarded-for"],
+      body: req.body,
+      file: req.file ? {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      } : null,
+      errorStack: error ? error.stack || String(error) : null
+    };
+    await mongoose.connection.db.collection("system_errors").insertOne(errorLog);
+    console.log("Logged system error to MongoDB:", message);
+  } catch (err) {
+    console.error("Failed to log system error to DB:", err);
+  }
+}
 
 async function generateInterViewReportController(req, res) {
   try {
     if (!req.file) {
+      await logSystemError(req, "No resume file uploaded");
       return res.status(400).json({
         error: "No resume file uploaded",
       });
@@ -17,6 +41,7 @@ async function generateInterViewReportController(req, res) {
       resumeText = resumeData.text;
     } catch (pdfError) {
       console.error("PDF parse error:", pdfError);
+      await logSystemError(req, "PDF parse error: " + pdfError.message, pdfError);
       return res.status(400).json({
         error: pdfError.message,
       });
@@ -25,6 +50,7 @@ async function generateInterViewReportController(req, res) {
     const { selfDescription, jobDescription } = req.body;
 
     if (!selfDescription || !jobDescription) {
+      await logSystemError(req, `Missing required fields: selfDescription=${!!selfDescription}, jobDescription=${!!jobDescription}`);
       return res.status(400).json({
         error: "Missing required fields",
       });
