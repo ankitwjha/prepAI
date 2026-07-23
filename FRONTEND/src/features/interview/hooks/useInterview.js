@@ -91,9 +91,11 @@ export const useInterview = () => {
       const data = await generateResumePdf({ interviewReportId: reportId });
       if (data?.html) {
         const iframe = document.createElement("iframe");
-        iframe.style.position = "fixed";
-        iframe.style.width = "0px";
-        iframe.style.height = "0px";
+        iframe.style.position = "absolute";
+        iframe.style.top = "-9999px";
+        iframe.style.left = "-9999px";
+        iframe.style.width = "1024px";
+        iframe.style.height = "768px";
         iframe.style.border = "none";
         document.body.appendChild(iframe);
 
