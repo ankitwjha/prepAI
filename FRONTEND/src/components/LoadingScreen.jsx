@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './LoadingScreen.scss';
 
 const LOADING_PHASES = [
-  "One day you're gonna make the onions cry...",
-  "I love deadlines. I love the whooshing noise they make as they go by...",
-  "Reality continues to ruin my life....",
-  // "Synthesizing Technical & Behavioral Questions...",
-  // "Building 5-Day Targeted Preparation Roadmap...",
-  // "Finalizing AI Interview Strategy Report..."
+  "Rewriting your experience to sound 10x more impressive...",
+  "Hiding stack overflow tabs before the AI starts looking...",
+  "Convincing the algorithm that you actually know Kubernetes...",
+  "Adding 'Senior' to your target title. Don't worry, it's our secret...",
+  "Calculating coffee requirements to survive a 5-day roadmap...",
+  "Synthesizing technical questions you'll Google right after the interview...",
+  "AI skepticism levels: 98% (calculating chartered accountant match score)...",
+  "Locating the missing semicolon in our code... Just kidding, it's JavaScript.",
+  "STAR method answers generated: 8 (dread levels: low)...",
+  "Polishing your custom PrepAiHelps chatbot advice..."
 ];
 
 const LoadingScreen = ({ message }) => {

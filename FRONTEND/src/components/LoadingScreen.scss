@@ -1,7 +1,7 @@
 .loading-screen-container {
   width: 100%;
   min-height: 100vh;
-  background: radial-gradient(circle at center, #1e1b4b 0%, #0f0c29 70%, #050515 100%);
+  background: radial-gradient(circle at center, #061914 0%, #030712 70%, #010205 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,8 +31,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff2d78, #a78bfa);
-  box-shadow: 0 0 25px #ff2d78, 0 0 50px rgba(167, 139, 250, 0.6);
+  background: linear-gradient(135deg, #10b981, #34d399);
+  box-shadow: 0 0 25px #10b981, 0 0 50px rgba(52, 211, 153, 0.6);
   animation: orb-pulse 1.8s infinite ease-in-out alternate;
 }
 
@@ -45,16 +45,16 @@
 .orb-ring-1 {
   width: 70px;
   height: 70px;
-  border-top-color: #ff2d78;
-  border-right-color: rgba(255, 45, 120, 0.3);
+  border-top-color: #10b981;
+  border-right-color: rgba(16, 185, 129, 0.3);
   animation: spin-cw 2.2s linear infinite;
 }
 
 .orb-ring-2 {
   width: 90px;
   height: 90px;
-  border-bottom-color: #a78bfa;
-  border-left-color: rgba(167, 139, 250, 0.3);
+  border-bottom-color: #34d399;
+  border-left-color: rgba(52, 211, 153, 0.3);
   animation: spin-ccw 3s linear infinite;
 }
 
@@ -68,7 +68,7 @@
 
 .loading-phase {
   font-size: 0.95rem;
-  color: #a78bfa;
+  color: #34d399;
   margin: 0 0 2rem 0;
   height: 1.5rem;
   font-weight: 500;
@@ -87,7 +87,7 @@
 .progress-bar-fill {
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #ff2d78, #a78bfa, #38bdf8);
+  background: linear-gradient(90deg, #10b981, #34d399, #059669);
   border-radius: 10px;
   animation: shimmer-progress 2s infinite ease-in-out;
 }
@@ -95,11 +95,11 @@
 @keyframes orb-pulse {
   0% {
     transform: scale(0.85);
-    box-shadow: 0 0 15px #ff2d78, 0 0 30px rgba(167, 139, 250, 0.4);
+    box-shadow: 0 0 15px #10b981, 0 0 30px rgba(52, 211, 153, 0.4);
   }
   100% {
     transform: scale(1.15);
-    box-shadow: 0 0 30px #ff2d78, 0 0 60px rgba(167, 139, 250, 0.8);
+    box-shadow: 0 0 30px #10b981, 0 0 60px rgba(52, 211, 153, 0.8);
   }
 }
 
