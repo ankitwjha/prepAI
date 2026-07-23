@@ -1,3 +1,6 @@
+
+
+
 {
   "version": 2,
   "builds": [
@@ -19,12 +22,8 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/FRONTEND/dist/assets/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/FRONTEND/dist/index.html"
+      "dest": "/index.html"
     }
   ]
 }

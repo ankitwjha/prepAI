@@ -574,4 +574,4 @@ MANDATORY HTML RESUME REQUIREMENTS:
     return await generatePdfFromHtml(jsonContent.html);
 }
 
-module.exports = { generateInterviewReport, generateResumePdf };
+module.exports = { generateInterviewReport, generateResumePdf };
