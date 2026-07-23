@@ -37,6 +37,7 @@ app.get(["/api/ping", "/ping"], (req, res) => {
     res.json({
         status: "ok",
         message: "PrepAI API Serverless is online!",
+        version: "1.0.2",
         dbState: mongoose.connection.readyState,
         env: {
             hasMongoUri: !!process.env.MONGO_URI,
