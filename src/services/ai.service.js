@@ -118,7 +118,9 @@ function buildDynamicFallbackPayload({ resume, selfDescription, jobDescription }
 
     // 3. Compute match score dynamically
     const indicatesNoKnowledge = !bgLower.trim() || /nothing|no experience|dont know|don't know|zero|none|beginner|no skill|know nothing/i.test(bgLower);
-    const isFieldMismatch = checkDomainMismatch(bgLower, jdLower);
+    const isSelfDescMismatch = selfDescription ? checkDomainMismatch(selfDescription.toLowerCase(), jdLower) : false;
+    const isResumeMismatch = resume ? checkDomainMismatch(resume.toLowerCase(), jdLower) : false;
+    const isFieldMismatch = isSelfDescMismatch || isResumeMismatch;
     const matchScore = (indicatesNoKnowledge || isFieldMismatch) ? (Math.floor(Math.random() * 10) + 18) : (Math.floor(Math.random() * 15) + 65);
 
     // 4. Tailor Technical Questions dynamically
@@ -385,7 +387,9 @@ STRICT EVALUATION & MATCH SCORE RULES:
     const combinedBackground = `${resume || ""} ${selfDescription || ""}`.toLowerCase();
     const indicatesNoKnowledge = !combinedBackground.trim() || 
         /nothing|no experience|dont know|don't know|zero|none|beginner|no skill|know nothing/i.test(combinedBackground);
-    const isFieldMismatch = checkDomainMismatch(combinedBackground, jobDescription.toLowerCase());
+    const isSelfDescMismatch = selfDescription ? checkDomainMismatch(selfDescription.toLowerCase(), jobDescription.toLowerCase()) : false;
+    const isResumeMismatch = resume ? checkDomainMismatch(resume.toLowerCase(), jobDescription.toLowerCase()) : false;
+    const isFieldMismatch = isSelfDescMismatch || isResumeMismatch;
 
     if (indicatesNoKnowledge || isFieldMismatch) {
         // Cap match score strictly to low range (18-28%)
@@ -464,6 +468,58 @@ STRICT EVALUATION & MATCH SCORE RULES:
 
     if (!result.title) {
         result.title = jobDescription.substring(0, 50) + " Interview Plan";
+    }
+
+    // Sanitize technicalQuestions
+    if (Array.isArray(result.technicalQuestions)) {
+        result.technicalQuestions = result.technicalQuestions.map(q => ({
+            question: typeof q.question === "string" ? q.question : "Technical question",
+            intention: typeof q.intention === "string" ? q.intention : "Assess technical depth",
+            answer: typeof q.answer === "string" ? q.answer : "Detail concepts and best practices"
+        }));
+    } else {
+        result.technicalQuestions = [];
+    }
+
+    // Sanitize behavioralQuestions
+    if (Array.isArray(result.behavioralQuestions)) {
+        result.behavioralQuestions = result.behavioralQuestions.map(q => ({
+            question: typeof q.question === "string" ? q.question : "Behavioral question",
+            intention: typeof q.intention === "string" ? q.intention : "Assess communication and soft skills",
+            answer: typeof q.answer === "string" ? q.answer : "STAR response detail"
+        }));
+    } else {
+        result.behavioralQuestions = [];
+    }
+
+    // Sanitize skillGaps
+    const validSeverities = ["low", "medium", "high"];
+    if (Array.isArray(result.skillGaps)) {
+        result.skillGaps = result.skillGaps.map(g => {
+            let severity = typeof g.severity === "string" ? g.severity.toLowerCase() : "medium";
+            if (!validSeverities.includes(severity)) {
+                severity = "medium";
+            }
+            return {
+                skill: typeof g.skill === "string" ? g.skill : "Required Skill",
+                severity
+            };
+        });
+    } else {
+        result.skillGaps = [];
+    }
+
+    // Sanitize preparationPlan
+    if (Array.isArray(result.preparationPlan)) {
+        result.preparationPlan = result.preparationPlan.map(p => {
+            const day = typeof p.day === "number" ? p.day : 1;
+            const focus = typeof p.focus === "string" ? p.focus : "Preparation focus";
+            let tasks = Array.isArray(p.tasks) ? p.tasks.map(t => typeof t === "string" ? t : String(t)) : ["Review concepts"];
+            if (tasks.length === 0) tasks = ["Review concepts"];
+            return { day, focus, tasks };
+        });
+    } else {
+        result.preparationPlan = [];
     }
 
     return result;
