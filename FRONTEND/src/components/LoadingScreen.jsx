@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './LoadingScreen.scss';
 
 const LOADING_PHASES = [
-  "Analyzing Resume & Background...",
-  "Evaluating Job Description Requirements...",
-  "Synthesizing Technical & Behavioral Questions...",
-  "Building 5-Day Targeted Preparation Roadmap...",
-  "Finalizing AI Interview Strategy Report..."
+  "One day you're gonna make the onions cry...",
+  "I love deadlines. I love the whooshing noise they make as they go by...",
+  "Reality continues to ruin my life....",
+  // "Synthesizing Technical & Behavioral Questions...",
+  // "Building 5-Day Targeted Preparation Roadmap...",
+  // "Finalizing AI Interview Strategy Report..."
 ];
 
 const LoadingScreen = ({ message }) => {
