@@ -41,7 +41,8 @@ export const useInterview = () => {
       return null;
     } catch (error) {
       console.error("Error generating report:", error);
-      return null;
+      const errMsg = error.response?.data?.error || error.response?.data?.message || error.message;
+      throw new Error(errMsg);
     } finally {
       setLoading(false);
     }

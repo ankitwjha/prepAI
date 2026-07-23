@@ -77,7 +77,7 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Error generating report:", error)
-      alert("Server error while generating report. Please check backend logs.")
+      alert(error.message || "Server error while generating report. Please check backend logs.")
     }
   }
 
