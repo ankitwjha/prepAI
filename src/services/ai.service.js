@@ -525,68 +525,7 @@ STRICT EVALUATION & MATCH SCORE RULES:
     return result;
 }
 
-async function generatePdfFromHtml(htmlContent) {
-    try {
-        let cleanHtml = htmlContent || "";
-
-        // Strip markdown backtick codeblocks if returned inside JSON string
-        cleanHtml = cleanHtml
-            .replace(/^```html\s*/i, "")
-            .replace(/^```xml\s*/i, "")
-            .replace(/^```\s*/i, "")
-            .replace(/```\s*$/i, "")
-            .trim();
-
-        if (!cleanHtml.toLowerCase().includes("<html")) {
-            cleanHtml = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Resume</title>
-    <style>
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e293b; line-height: 1.6; margin: 30px; }
-        h1 { color: #0f172a; border-bottom: 2px solid #2563eb; padding-bottom: 8px; font-size: 24px; }
-        h2 { color: #1d4ed8; margin-top: 20px; font-size: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
-        p, li { color: #334155; font-size: 14px; }
-    </style>
-</head>
-<body>
-    ${cleanHtml}
-</body>
-</html>`;
-        }
-
-        let puppeteer;
-        try {
-            puppeteer = require("puppeteer");
-        } catch (e) {
-            console.warn("Puppeteer module load failed in serverless context:", e.message);
-        }
-
-        if (!puppeteer) {
-            throw new Error("PDF generation via Puppeteer is not supported in this serverless environment.");
-        }
-
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        });
-        const page = await browser.newPage();
-        await page.setContent(cleanHtml, { waitUntil: "networkidle0" });
-        const pdfBuffer = await page.pdf({
-            format: "A4",
-            printBackground: true,
-            margin: { top: "15mm", right: "15mm", bottom: "15mm", left: "15mm" }
-        });
-        await browser.close();
-        return pdfBuffer;
-    } catch (err) {
-        console.error("Puppeteer error:", err);
-        throw new Error("Failed to generate PDF from HTML: " + err.message);
-    }
-}
-
-async function generateResumePdf({ resume, selfDescription, jobDescription }) {
+async function generateResumeHtml({ resume, selfDescription, jobDescription }) {
     const resumePdfSchema = z.object({
         html: z.string().describe("The clean HTML content of the resume which can be converted to PDF.")
     });
@@ -614,7 +553,7 @@ MANDATORY HTML RESUME REQUIREMENTS:
     try {
         jsonContent = JSON.parse(responseText);
     } catch (err) {
-        console.error("JSON parse error in generateResumePdf:", err, "Raw response:", responseText);
+        console.error("JSON parse error in generateResumeHtml:", err, "Raw response:", responseText);
         jsonContent = {
             html: `<!DOCTYPE html>
 <html>
@@ -686,7 +625,16 @@ MANDATORY HTML RESUME REQUIREMENTS:
         };
     }
 
-    return await generatePdfFromHtml(jsonContent.html);
+    let html = jsonContent.html || "";
+    // Clean up markdown wrappers
+    html = html
+        .replace(/^```html\s*/i, "")
+        .replace(/^```xml\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/```\s*$/i, "")
+        .trim();
+
+    return html;
 }
 
 async function callAiChatWithRetry(prompt, systemInstruction) {
@@ -780,4 +728,4 @@ Instructions:
     }
 }
 
-module.exports = { generateInterviewReport, generateResumePdf, generateChatResponse };
+module.exports = { generateInterviewReport, generateResumeHtml, generateChatResponse };

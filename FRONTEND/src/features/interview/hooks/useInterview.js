@@ -88,17 +88,31 @@ export const useInterview = () => {
   const getResumePdf = async (reportId) => {
     setLoading(true);
     try {
-      const response = await generateResumePdf({ interviewReportId: reportId });
-      const url = window.URL.createObjectURL(new Blob([response], { type: "application/pdf" }));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `resume_${reportId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const data = await generateResumePdf({ interviewReportId: reportId });
+      if (data?.html) {
+        const iframe = document.createElement("iframe");
+        iframe.style.position = "fixed";
+        iframe.style.width = "0px";
+        iframe.style.height = "0px";
+        iframe.style.border = "none";
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(data.html);
+        doc.close();
+
+        setTimeout(() => {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+        }, 500);
+      } else {
+        alert("Failed to generate resume text layout. Please try again.");
+      }
     } catch (error) {
       console.error("Error generating resume PDF:", error);
+      alert("Error generating resume. Please check console logs.");
     } finally {
       setLoading(false);
     }
