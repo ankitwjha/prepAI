@@ -42,8 +42,14 @@ async function generateInterViewReportController(req, res) {
     } catch (pdfError) {
       console.error("PDF parse error:", pdfError);
       await logSystemError(req, "PDF parse error: " + pdfError.message, pdfError);
+      
+      let clientMessage = "Failed to parse the resume file. Please ensure it is a valid, uncorrupted PDF document.";
+      if (pdfError.message && pdfError.message.includes("XRef")) {
+        clientMessage = "The uploaded file is not a valid PDF document or is corrupted (bad XRef entry). Please upload a valid PDF resume.";
+      }
+      
       return res.status(400).json({
-        error: pdfError.message,
+        error: clientMessage,
       });
     }
 
