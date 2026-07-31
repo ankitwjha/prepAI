@@ -62,6 +62,21 @@ async function generateInterViewReportController(req, res) {
       });
     }
 
+    // Check if an identical report already exists for this user to avoid redundant AI calls
+    const existingReport = await interviewReportModel.findOne({
+      user: req.user.id,
+      resume: resumeText,
+      selfDescription,
+      jobDescription,
+    });
+
+    if (existingReport) {
+      return res.status(200).json({
+        message: "Interview report retrieved from cache",
+        interviewReport: existingReport,
+      });
+    }
+
     let interViewReportByAi = {};
 
     try {

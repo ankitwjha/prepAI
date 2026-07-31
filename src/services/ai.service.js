@@ -238,7 +238,7 @@ function buildDynamicFallbackPayload({ resume, selfDescription, jobDescription }
 }
 
 async function callAiWithRetry(prompt, schema, type = "generic", contextData = {}) {
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-8b", "gemini-2.5-pro"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
     let lastError = null;
 
     const schemaObj = zodToJsonSchema(schema);
@@ -638,7 +638,7 @@ MANDATORY HTML RESUME REQUIREMENTS:
 }
 
 async function callAiChatWithRetry(prompt, systemInstruction) {
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-8b", "gemini-2.5-pro"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
     let lastError = null;
 
     for (const model of modelsToTry) {
