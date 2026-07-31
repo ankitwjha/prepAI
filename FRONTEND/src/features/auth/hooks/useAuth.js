@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../auth.context";
-import { login, register, logout, getMe } from "../services/auth.api";
+import { login, register, logout, getMe, verifyOtp, resendOtp } from "../services/auth.api";
 
 export const useAuth = () => {
     const context = useContext(AuthContext)
@@ -20,7 +20,12 @@ export const useAuth = () => {
         } catch (err) {
             const errorMsg = err?.response?.data?.message || err.message || "Login failed"
             console.error("Login failed:", errorMsg)
-            return { success: false, error: errorMsg }
+            return { 
+                success: false, 
+                error: errorMsg,
+                isUnverified: err?.response?.status === 403,
+                email: err?.response?.data?.email
+            }
         } finally {
             setLoading(false)
         }
@@ -30,14 +35,40 @@ export const useAuth = () => {
         setLoading(true)
         try {
             const data = await register({ username, email, password })
-            setUser(data.user)
-            return { success: true }
+            // Note: do not set user here because user is not verified yet
+            return { success: true, email: data.email }
         } catch (err) {
             const errorMsg = err?.response?.data?.message || err.message || "Registration failed"
             console.error("Registration failed:", errorMsg)
             return { success: false, error: errorMsg }
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleVerifyOtp = async ({ email, otp }) => {
+        setLoading(true)
+        try {
+            const data = await verifyOtp({ email, otp })
+            setUser(data.user)
+            return { success: true }
+        } catch (err) {
+            const errorMsg = err?.response?.data?.message || err.message || "Verification failed"
+            console.error("Verification failed:", errorMsg)
+            return { success: false, error: errorMsg }
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleResendOtp = async ({ email }) => {
+        try {
+            const data = await resendOtp({ email })
+            return { success: true, message: data.message }
+        } catch (err) {
+            const errorMsg = err?.response?.data?.message || err.message || "Failed to resend code"
+            console.error("Resend OTP failed:", errorMsg)
+            return { success: false, error: errorMsg }
         }
     }
 
@@ -75,6 +106,8 @@ export const useAuth = () => {
         loading,
         handleRegister,
         handleLogin,
-        handleLogout
+        handleLogout,
+        handleVerifyOtp,
+        handleResendOtp
     }
 }

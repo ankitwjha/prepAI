@@ -31,6 +31,8 @@ const Login = () => {
         const res = await handleLogin({ email, password })
         if (res?.success) {
             navigate("/")
+        } else if (res?.isUnverified) {
+            navigate("/verify-otp", { state: { email: res.email || email } })
         } else if (res?.error) {
             setError(res.error)
         }

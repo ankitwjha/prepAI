@@ -12,6 +12,20 @@ const authRouter= Router()
  */
 authRouter.post("/register",authController.registerUserController)
 
+/**
+ * @route POST /api/auth/verify-otp
+ * @description Verify email with 6-digit OTP code
+ * @access Public
+ */
+authRouter.post("/verify-otp", authController.verifyOtpController)
+
+/**
+ * @route POST /api/auth/resend-otp
+ * @description Resend a new OTP verification code
+ * @access Public
+ */
+authRouter.post("/resend-otp", authController.resendOtpController)
+
 
 /**
  * @route POST /api/auth/login

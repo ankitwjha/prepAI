@@ -32,7 +32,7 @@ const Register = () => {
         setError("")
         const res = await handleRegister({ username, email, password })
         if (res?.success) {
-            navigate("/")
+            navigate("/verify-otp", { state: { email } })
         } else if (res?.error) {
             setError(res.error)
         }

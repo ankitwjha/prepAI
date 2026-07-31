@@ -2,6 +2,7 @@
 import {createBrowserRouter} from "react-router";
 import Login from  "./features/auth/pages/Login.jsx";
 import Regsiter from "./features/auth/pages/Register.jsx";
+import VerifyOtp from "./features/auth/pages/VerifyOtp.jsx";
 import Protected from "./features/auth/components/Protected.jsx";
 import Home from "./features/interview/pages/Home.jsx";
 import Interview from "./features/interview/pages/Interview.jsx";
@@ -17,6 +18,10 @@ export const router=createBrowserRouter([
     {
         path:"/register",
         element:<Regsiter/>
+    },
+    {
+        path:"/verify-otp",
+        element:<VerifyOtp/>
     },
     {
         path:"/",
